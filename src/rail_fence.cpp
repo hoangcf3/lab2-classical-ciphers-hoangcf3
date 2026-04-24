@@ -23,7 +23,6 @@ string rail_fence_encrypt(const string &plaintext, int rails) {
     int direction = 1;
 
     for (char c : plaintext) {
-        // TODO(student): Q6 can keep spaces as normal characters.
         fence[rail] += c;
         rail += direction;
         if (rail == rails - 1 || rail == 0) direction = -direction;
@@ -35,8 +34,38 @@ string rail_fence_encrypt(const string &plaintext, int rails) {
 }
 
 string rail_fence_decrypt(const string &ciphertext, int rails) {
-    // TODO(student): Q5
-    return ciphertext;
+    if (rails <= 1 || ciphertext.empty()) return ciphertext;
+
+    int n = ciphertext.size();
+    vector<vector<char>> fence(rails, vector<char>(n, '\n'));
+
+    int rail = 0;
+    int direction = 1;
+    for (int i = 0; i < n; i++) {
+        fence[rail][i] = '*';
+        rail += direction;
+        if (rail == rails - 1 || rail == 0) direction = -direction;
+    }
+
+    int idx = 0;
+    for (int r = 0; r < rails; r++) {
+        for (int c = 0; c < n; c++) {
+            if (fence[r][c] == '*' && idx < n) {
+                fence[r][c] = ciphertext[idx++];
+            }
+        }
+    }
+
+    string plaintext;
+    rail = 0;
+    direction = 1;
+    for (int i = 0; i < n; i++) {
+        plaintext += fence[rail][i];
+        rail += direction;
+        if (rail == rails - 1 || rail == 0) direction = -direction;
+    }
+
+    return plaintext;
 }
 
 string read_message_from_file(const string &path) {
